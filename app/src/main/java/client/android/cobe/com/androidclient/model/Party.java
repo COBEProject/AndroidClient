@@ -3,7 +3,7 @@ package client.android.cobe.com.androidclient.model;
 public class Party {
 
     private String name;
-    private int nbPlayers;
+    private String nbPlayers;
 
     public String getName() {
         return name;
@@ -14,11 +14,11 @@ public class Party {
         return this;
     }
 
-    public int getNbPlayers() {
+    public String getNbPlayers() {
         return nbPlayers;
     }
 
-    public Party setNbPlayers(int nbPlayers) {
+    public Party setNbPlayers(String nbPlayers) {
         this.nbPlayers = nbPlayers;
         return this;
     }
