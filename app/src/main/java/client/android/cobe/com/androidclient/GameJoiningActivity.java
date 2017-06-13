@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 
 import client.android.cobe.com.androidclient.web_interface.WaitPlayersActivity;
 
+
 public class GameJoiningActivity extends AppCompatActivity {
 
     private Socket mSocket;

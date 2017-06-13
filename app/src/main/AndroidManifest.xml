@@ -15,8 +15,8 @@
         <activity android:name=".GameCreationFormActivity" />
         <activity android:name=".BeginActivity" />
         <activity android:name=".GameJoiningActivity" />
-        <activity
-            android:name=".SplashScreen"
+        <activity android:name=".questions.YesNoQuestionsActivity" />
+        <activity android:name=".SplashScreen"
             android:label="@string/app_name"
             android:screenOrientation="portrait">
             <intent-filter>
