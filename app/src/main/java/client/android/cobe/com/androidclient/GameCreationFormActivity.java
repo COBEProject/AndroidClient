@@ -12,7 +12,10 @@ import com.loopj.android.http.JsonHttpResponseHandler;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import com.google.gson.*;
 import client.android.cobe.com.androidclient.model.Party;
 import cz.msebera.android.httpclient.Header;
 import cz.msebera.android.httpclient.entity.StringEntity;
@@ -26,7 +29,7 @@ public class GameCreationFormActivity extends AppCompatActivity {
     }
 
     public void createGame(View view) {
-        Party party = new Party();
+        final Party party = new Party();
         EditText nomEditText= (EditText)findViewById(R.id.name);
         EditText nbPlayersEditText = (EditText)findViewById(R.id.nbPlayers);
         String nom = nomEditText.getText().toString();
@@ -35,6 +38,8 @@ public class GameCreationFormActivity extends AppCompatActivity {
         final Intent intent = new Intent(this, PlayerCreationFormActivity.class);
         final Intent intent2 = new Intent(this, BeginActivity.class);
         StringEntity entity = null;
+
+        final Gson gson = new GsonBuilder().create();
 
         try {
             entity = new StringEntity(party.toString());
@@ -46,6 +51,10 @@ public class GameCreationFormActivity extends AppCompatActivity {
         client.post(this, "http://demo5712444.mockable.io/party", entity , "application/json", new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+                Party partyResponse;
+                partyResponse = gson.fromJson(response.toString(), Party.class);
+                Logger.getGlobal().log(Level.INFO, partyResponse.getId_game());
+                intent.putExtra("id_game", partyResponse.getId_game());
                 startActivity(intent);
             }
 

@@ -49,31 +49,33 @@
             android:textSize="18sp"
             android:layout_weight="0.05" />
 
-        <LinearLayout
+        <RadioGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1">
+            android:orientation="horizontal">
 
             <RadioButton
                 android:id="@+id/M"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Masculin"
-                android:layout_weight="0.85" />
+                android:layout_weight="0.85"
+                android:onClick="onRadioButtonClicked"/>
 
             <RadioButton
                 android:id="@+id/F"
                 android:layout_width="184dp"
                 android:layout_height="wrap_content"
-                android:text="Feminin" />
+                android:text="Feminin"
+                android:onClick="onRadioButtonClicked"/>
 
-        </LinearLayout>
+        </RadioGroup>
 
         <Button
             android:id="@+id/suivant"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:onClick="createUser"
             android:text="Suivant" />
 
     </LinearLayout>
