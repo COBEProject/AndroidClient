@@ -21,8 +21,6 @@ import client.android.cobe.com.androidclient.util.RESTConfiguration;
 
 public class YesNoQuestionsActivity extends Activity {
 
-    private Button button_yes;
-    private Button button_no;
     private TextView question_text;
     private ImageView imageYesNoQuestion;
 
@@ -36,8 +34,6 @@ public class YesNoQuestionsActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_yes_no_questions);
 
-        button_yes = (Button) findViewById(R.id.yesButton);
-        button_no = (Button) findViewById(R.id.noButton);
         question_text = (TextView) findViewById(R.id.yesNoQuestion);
         imageYesNoQuestion = (ImageView) findViewById(R.id.imageYesNoQuestion);
 
