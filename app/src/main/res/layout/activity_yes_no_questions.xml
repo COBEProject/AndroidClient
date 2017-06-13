@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="client.android.cobe.com.androidclient.questions.YesNoQuestionsActivity"
+    tools:layout_editor_absoluteY="81dp"
+    tools:layout_editor_absoluteX="0dp">
+
+    <Button
+        android:id="@+id/yesButton"
+        android:text="Oui"
+        android:onClick="onClickYes"
+        android:layout_width="88dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="53dp"
+        app:layout_constraintBaseline_toBaselineOf="@+id/noButton"
+        tools:layout_constraintBaseline_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        app:layout_constraintLeft_toLeftOf="@+id/yesNoQuestion" />
+
+    <Button
+        android:id="@+id/noButton"
+        android:layout_width="88dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="20dp"
+        android:layout_marginEnd="72dp"
+        android:clickable="true"
+        android:onClick="onClickNo"
+        android:text="Non"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="@+id/yesNoQuestion"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintRight_creator="1"
+        android:layout_marginRight="72dp" />
+
+    <TextView
+        android:id="@+id/yesNoQuestion"
+        android:layout_width="373dp"
+        android:layout_height="122dp"
+        android:layout_marginBottom="115dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:text="TextView"
+        android:textAlignment="center"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@+id/yesButton"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1"
+        tools:layout_constraintRight_creator="1" />
+
+    <ImageView
+        android:id="@+id/imageYesNoQuestion"
+        android:layout_width="368dp"
+        android:layout_height="235dp"
+        android:layout_marginBottom="14dp"
+        android:layout_marginRight="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/yesNoQuestion"
+        app:layout_constraintRight_toRightOf="parent"
+        app:srcCompat="@android:color/darker_gray"
+        android:layout_marginEnd="8dp" />
+
+</android.support.constraint.ConstraintLayout>

@@ -1,20 +1,20 @@
 package client.android.cobe.com.androidclient;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
-import com.loopj.android.http.*;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 
-import org.json.JSONException;
+import com.loopj.android.http.AsyncHttpClient;
+import com.loopj.android.http.JsonHttpResponseHandler;
+
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 
 import client.android.cobe.com.androidclient.model.Party;
 import cz.msebera.android.httpclient.Header;
-import cz.msebera.android.httpclient.HttpEntity;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class GameCreationFormActivity extends AppCompatActivity {
