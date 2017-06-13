@@ -7,6 +7,7 @@ public class User {
     private String name;
     private String age;
     private String gender;
+    private String id_game;
 
     public String getName() {
         return name;
@@ -32,6 +33,15 @@ public class User {
 
     public User setGender(String gender) {
         this.gender = gender;
+        return this;
+    }
+
+    public String getId_game() {
+        return id_game;
+    }
+
+    public User setId_game(String id_game) {
+        this.id_game = id_game;
         return this;
     }
 

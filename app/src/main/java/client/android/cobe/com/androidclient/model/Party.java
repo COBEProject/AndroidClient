@@ -4,8 +4,18 @@ import com.google.gson.GsonBuilder;
 
 public class Party {
 
+    private String id_game;
     private String name;
     private String nbPlayers;
+
+    public String getId_game() {
+        return id_game;
+    }
+
+    public Party setId_game(String id_game) {
+        this.id_game = id_game;
+        return this;
+    }
 
     public String getName() {
         return name;
