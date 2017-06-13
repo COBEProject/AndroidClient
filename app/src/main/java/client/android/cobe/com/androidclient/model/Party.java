@@ -1,5 +1,7 @@
 package client.android.cobe.com.androidclient.model;
 
+import com.google.gson.GsonBuilder;
+
 public class Party {
 
     private String name;
@@ -21,5 +23,10 @@ public class Party {
     public Party setNbPlayers(String nbPlayers) {
         this.nbPlayers = nbPlayers;
         return this;
+    }
+
+    @Override
+    public String toString() {
+        return new GsonBuilder().create().toJson(this, Party.class);
     }
 }
