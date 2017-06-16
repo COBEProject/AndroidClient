@@ -1,8 +1,5 @@
 package client.android.cobe.com.androidclient.util;
 
-import android.content.Context;
-import android.content.Intent;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -10,56 +7,41 @@ import com.github.nkzawa.emitter.Emitter;
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import client.android.cobe.com.androidclient.GameJoiningActivity;
-import client.android.cobe.com.androidclient.web_interface.WaitPlayersActivity;
-
-import static android.support.v4.app.ActivityCompat.startActivity;
-import static android.support.v4.content.ContextCompat.createDeviceProtectedStorageContext;
+import client.android.cobe.com.androidclient.event.EndGameEvent;
+import client.android.cobe.com.androidclient.event.NewQuestionDataEvent;
+import client.android.cobe.com.androidclient.event.WaitForBeginningEvent;
+import client.android.cobe.com.androidclient.model.Answer;
+import client.android.cobe.com.androidclient.model.Question;
+import de.greenrobot.event.EventBus;
 
 public class SOCKETConfiguration {
 
-    /**
-     * The constant STATE_CONNECTING.
-     */
     public static final int STATE_CONNECTING = 1;
-    /**
-     * The constant STATE_CONNECTED.
-     */
+
     public static final int STATE_CONNECTED = 2;
-    /**
-     * The constant STATE_DISCONNECTED.
-     */
+
     public static final int STATE_DISCONNECTED = 3;
 
-    /**
-     * The constant CONNECTING.
-     */
     public static final String CONNECTING = "Connecting";
-    /**
-     * The constant CONNECTED.
-     */
+
     public static final String CONNECTED = "Connected";
-    /**
-     * The constant DISCONNECTED.
-     */
+
     public static final String DISCONNECTED = "Disconnected";
 
-    private boolean waitForPlayers;
+    private final String userId = java.util.UUID.randomUUID().toString();
+
+    private int gameId;
+
+    private Question question;
+    private Answer answers;
 
     private static SOCKETConfiguration instance;
 
+    private SOCKETConfiguration() {}
 
-    private SOCKETConfiguration() {
-        waitForPlayers = false;
-    }
-
-    /**
-     * Gets instance.
-     *
-     * @return the instance
-     */
     public synchronized static SOCKETConfiguration getInstance() {
         if (instance == null) {
             instance = new SOCKETConfiguration();
@@ -67,32 +49,14 @@ public class SOCKETConfiguration {
         return instance;
     }
 
-    /**
-     * The constant TAG.
-     */
-    //public static final String TAG = SOCKETConfiguration.class.getSimpleName();
     private Socket socket;
-    //private List<OnSocketConnectionListener> onSocketConnectionListenerList;
 
-    /**
-     * Connect socket.
-     *
-     * @param host   the host
-     */
-    //public void connectSocket(String token,String userId, String host) {
     public void connectSocket(String host) {
         try {
             if(socket==null){
-                //String serverAddress = host;
-                //IO.Options opts = new IO.Options();
-                //opts.forceNew = true;
-                //opts.reconnection = true;
-                //opts.reconnectionAttempts=5;
-                //opts.secure = true;
-                //opts.query = "token=" + token + "&" + "user_id=" + userId;
-                //socket = IO.socket(host, opts);
-                 //final Intent intent = new Intent(this, WaitPlayersActivity.class);
-                socket = IO.socket(host);
+                IO.Options opts = new IO.Options();
+                opts.query = "clientId=" + userId;
+                socket = IO.socket(host, opts);
 
                 socket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
                     @Override
@@ -101,15 +65,59 @@ public class SOCKETConfiguration {
                 }).on("connected", new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
-                        JSONObject obj = (JSONObject)args[0];
-                        Logger.getGlobal().log(Level.INFO, obj.toString());
+                        Logger.getGlobal().log(Level.INFO, "connected");
                     }
 
                 }).on("playerJoinedRoom", new Emitter.Listener() {
                     @Override
                     public void call(Object... args) {
-                        waitForPlayers = true;
                         Logger.getGlobal().log(Level.INFO, "Message recu 5/5");
+                    }
+
+                }).on("beginNewGame", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        EventBus.getDefault().postSticky(new WaitForBeginningEvent(true));
+                        Logger.getGlobal().log(Level.INFO, "Game begin in 5 sec");
+                    }
+
+                }).on("newQuestionData", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        Logger.getGlobal().log(Level.INFO, args[0].toString());
+                        JSONObject obj = (JSONObject)args[0];
+                        JSONObject objAns;
+                        question = new Question();
+                        answers = new Answer();
+                        try {
+                            question.setNumquestion(obj.getInt("numQuestion"));
+                            question.setQuestion(obj.getString("question"));
+                            objAns = obj.getJSONObject("answers");
+                            answers.setA(objAns.getString("A"))
+                                    .setB(objAns.getString("B"))
+                                    .setC("")
+                                    .setD("");
+                            question.setAnswer(answers);
+                            question.setCorresctAnswer(obj.getString("correctAnswer"));
+                        } catch (JSONException e) {
+                            Logger.getGlobal().log(Level.WARNING, e.toString());
+                        }
+
+                        try {
+                            objAns = obj.getJSONObject("answers");
+                            Answer answer2 = question.getAnswer();
+                            answer2.setC(objAns.getString("C"))
+                                    .setD(objAns.getString("D"));
+                            question.setAnswer(answer2);
+                        } catch (JSONException e) {
+                            Logger.getGlobal().log(Level.WARNING, e.toString());
+                        }
+                        EventBus.getDefault().postSticky(new NewQuestionDataEvent(true));
+                    }
+                }).on("endGame", new Emitter.Listener() {
+                    @Override
+                    public void call(Object... args) {
+                        EventBus.getDefault().postSticky(new EndGameEvent(true));
                     }
 
                 }).on(Socket.EVENT_DISCONNECT, new Emitter.Listener() {
@@ -127,76 +135,36 @@ public class SOCKETConfiguration {
         }
     }
 
-    public boolean isWaitForPlayers() {
-        return waitForPlayers;
+    public Question getQuestion() {
+        return question;
     }
 
-    private int lastState = -1;
+    public SOCKETConfiguration setQuestion(Question question) {
+        this.question = question;
+        return this;
+    }
 
-    /**
-     * Fire socket status intent.
-     *
-     * @param socketState the socket state
-     */
-    /*public synchronized void fireSocketStatus(final int socketState) {
-        if(onSocketConnectionListenerList !=null && lastState!=socketState){
-            lastState = socketState;
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    for(OnSocketConnectionListener listener: onSocketConnectionListenerList){
-                        listener.onSocketConnectionStateChange(socketState);
-                    }
-                }
-            });
-            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    lastState=-1;
-                }
-            },1000);
-        }
-    }*/
+    public String getUserId() {
+        return userId;
+    }
 
-    /**
-     * Fire internet status intent.
-     *
-     * @param socketState the socket state
-     */
-    /*public synchronized void fireInternetStatusIntent(final int socketState) {
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                if(onSocketConnectionListenerList !=null){
-                    for(OnSocketConnectionListener listener: onSocketConnectionListenerList){
-                        listener.onInternetConnectionStateChange(socketState);
-                    }
-                }
-            }
-        });
-    }*/
+    public int getGameId() {
+        return gameId;
+    }
 
-    /**
-     * Gets socket.
-     *
-     * @return the socket
-     */
+    public SOCKETConfiguration setGameId(int gameId) {
+        this.gameId = gameId;
+        return this;
+    }
+
     public Socket getSocket() {
         return socket;
     }
 
-    /**
-     * Sets socket.
-     *
-     * @param socket the socket
-     */
     public void setSocket(Socket socket) {
         this.socket = socket;
     }
 
-    /**
-     * Destroy.
-     */
     public void destroy(){
         if (socket != null) {
             socket.off();
@@ -205,92 +173,4 @@ public class SOCKETConfiguration {
             socket=null;
         }
     }
-
-    /**
-     * Sets socket connection listener.
-     *
-     * @param onSocketConnectionListenerListener the on socket connection listener listener
-     */
-    /*public void setSocketConnectionListener(OnSocketConnectionListener onSocketConnectionListenerListener) {
-        if(onSocketConnectionListenerList ==null){
-            onSocketConnectionListenerList = new ArrayList<>();
-            onSocketConnectionListenerList.add(onSocketConnectionListenerListener);
-        }else if(!onSocketConnectionListenerList.contains(onSocketConnectionListenerListener)){
-            onSocketConnectionListenerList.add(onSocketConnectionListenerListener);
-        }
-    }*/
-
-    /**
-     * Remove socket connection listener.
-     *
-     * @param onSocketConnectionListenerListener the on socket connection listener listener
-     */
-    /*public void removeSocketConnectionListener(OnSocketConnectionListener onSocketConnectionListenerListener) {
-        if(onSocketConnectionListenerList !=null
-                && onSocketConnectionListenerList.contains(onSocketConnectionListenerListener)){
-            onSocketConnectionListenerList.remove(onSocketConnectionListenerListener);
-        }
-    }*/
-
-    /**
-     * Remove all socket connection listener.
-     */
-    /*public void removeAllSocketConnectionListener() {
-        if(onSocketConnectionListenerList !=null){
-            onSocketConnectionListenerList.clear();
-        }
-    }*/
-
-    /**
-     * The type Net receiver.
-     */
-    //public static class NetReceiver extends BroadcastReceiver {
-
-        /**
-         * The Tag.
-         */
-        //public final String TAG = NetReceiver.class.getSimpleName();
-
-        /*@Override
-        public void onReceive(Context context, Intent intent) {
-            ConnectivityManager cm =
-                    (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-            boolean isConnected = activeNetwork != null &&
-                    activeNetwork.isConnectedOrConnecting();
-
-            SocketManager.getInstance().fireInternetStatusIntent(
-                    isConnected?SocketManager.STATE_CONNECTED:SocketManager.STATE_DISCONNECTED);
-            if (isConnected) {
-                if(SocketManager.getInstance().getSocket()!=null
-                        && !SocketManager.getInstance().getSocket().connected()){
-                    SocketManager.getInstance().fireSocketStatus(SocketManager.STATE_CONNECTING);
-                }
-                PowerManager powerManager =
-                        (PowerManager) context.getSystemService(Context.POWER_SERVICE);
-                boolean isScreenOn;
-                if (android.os.Build.VERSION.SDK_INT
-                        >= android.os.Build.VERSION_CODES.KITKAT_WATCH) {
-                    isScreenOn = powerManager.isInteractive();
-                }else{
-                    //noinspection deprecation
-                    isScreenOn = powerManager.isScreenOn();
-                }
-
-                if (isScreenOn && SocketManager.getInstance().getSocket() !=null) {
-                    Log.d(TAG, "NetReceiver: Connecting Socket");
-                    if(!SocketManager.getInstance().getSocket().connected()){
-                        SocketManager.getInstance().getSocket().connect();
-                    }
-                }
-            }else{
-                SocketManager.getInstance().fireSocketStatus(SocketManager.STATE_DISCONNECTED);
-                if(SocketManager.getInstance().getSocket() !=null){
-                    Log.d(TAG, "NetReceiver: disconnecting socket");
-                    SocketManager.getInstance().getSocket().disconnect();
-                }
-            }
-        }
-    }*/
-
 }
