@@ -25,7 +25,6 @@ public class GameJoiningActivity extends AppCompatActivity {
     }
 
     public void connectSocket(View view) {
-        final Intent intent = new Intent(this, WaitPlayersActivity.class);
 
         EditText playerNameEditText= (EditText)findViewById(R.id.playerName);
         EditText gameIdEditText = (EditText)findViewById(R.id.gameId);
@@ -47,19 +46,9 @@ public class GameJoiningActivity extends AppCompatActivity {
 
         SOCKETConfiguration.getInstance().getSocket().emit("playerJoinGame", obj);
 
-        while (!readyToGo()) {
-            readyToGo();
-        }
+        SOCKETConfiguration.getInstance().setGameId(gameId);
 
+        final Intent intent = new Intent(this, WaitPlayersActivity.class);
         startActivity(intent);
-
-    }
-
-    private boolean readyToGo() {
-        if (!SOCKETConfiguration.getInstance().isWaitForPlayers()) {
-            return false;
-        } else {
-            return true;
-        }
     }
 }
